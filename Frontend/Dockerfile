@@ -8,14 +8,13 @@ RUN npm install
 
 COPY . .
 
-RUN npm build -- --configuration production
+RUN npm run build -- --configuration production
 
 FROM nginx:stable-alpine
 
 COPY --from=build /app/dist/Frontend/browser /usr/share/nginx/html
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
 
 EXPOSE 80
 
