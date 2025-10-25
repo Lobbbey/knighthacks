@@ -1,0 +1,37 @@
+<div class="auth-container">
+  <div class="auth-box">
+    <h2>{{ isLogin ? 'Login' : 'Sign Up' }}</h2>
+    
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group" *ngIf="!isLogin">
+        <label for="name">Name</label>
+        <input type="text" id="name" [(ngModel)]="name" name="name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" [(ngModel)]="email" name="email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" [(ngModel)]="password" name="password" required>
+      </div>
+      
+      <button type="submit" class="submit-btn">
+        {{ isLogin ? 'Login' : 'Sign Up' }}
+      </button>
+    </form>
+    
+    <div class="toggle">
+      <p>
+        {{ isLogin ? "Don't have an account?" : 'Already have an account?' }}
+        <a (click)="toggleMode()">{{ isLogin ? 'Sign Up' : 'Login' }}</a>
+      </p>
+    </div>
+    
+    <div class="back-link">
+      <a (click)="goBack()">← Back to Home</a>
+    </div>
+  </div>
+</div>
