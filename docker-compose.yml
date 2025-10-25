@@ -1,0 +1,20 @@
+
+services:
+  Backend:
+    build: ./Backend
+    container_name: MediaShelfBackend
+    env_file:
+      - ./Backend/.env
+    ports:
+      -"5000:5000"
+    restart: unless-stopped
+
+  Frontend:
+    build: ./Frontend
+
+    args:
+      NEXT
+
+
+    container_name: MediaShelfFrontend
+    
