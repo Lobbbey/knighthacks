@@ -1,20 +1,18 @@
-
 services:
-  Backend:
+  backend:
     build: ./Backend
-    container_name: MediaShelfBackend
+    container_name: mediashelf_backend
     env_file:
       - ./Backend/.env
     ports:
-      -"5000:5000"
+      - "5000:5000"
     restart: unless-stopped
 
-  Frontend:
+  frontend:
     build: ./Frontend
-
-    args:
-      NEXT
-
-
-    container_name: MediaShelfFrontend
-    
+    container_name: mediashelf_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
