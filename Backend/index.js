@@ -9,8 +9,6 @@ app.use(express.json());
 const userRoute = require('./route/user.js');
 const mediaRoute = require('./route/model.js');
 
-
-
 app.use('/api/user', userRoute);
 app.use('/api/media', mediaRoute);
 
