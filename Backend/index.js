@@ -15,10 +15,9 @@ app.use('/api/media', mediaRoute);
 app.get('/', (req, res) => res.send('API Running'));
 
 // Mongoose Database connection
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true})
-    .then(() => console.log('MongoDB Connected'))
-    .catch(() => console.error(err))
-
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('MongoDB Connected')) 
+    .catch(err => console.error(err));
 
 const PORT = process.env.PORT || 5000; // User port from ENV or Default port
 app.listen(PORT, () => console.log(`Server start on ${PORT}`));
