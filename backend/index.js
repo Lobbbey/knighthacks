@@ -7,7 +7,7 @@ app.use(express.json());
 
 // Route Imports
 const userRoute = require('./route/user.js');
-const mediaRoute = require('./route/.js');
+const mediaRoute = require('./route/model.js');
 
 
 
