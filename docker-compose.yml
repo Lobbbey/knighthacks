@@ -1,16 +1,22 @@
 services:
   frontend:
-    image: nginx:latest
+    # 'build' tells Docker Compose to build the image from a Dockerfile
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    # Give the built image a name
+    image: mediashelf-frontend
     container_name: mediashelf_frontend
     ports:
-      - "3000:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./frontend/build:/usr/share/nginx/html
+      - "3000:3000" # <-- CHANGE THIS: Map to 3000 in the container
+    # REMOVE this volume:
+    # volumes:
+    #   - ./nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - backend
     networks:
       - mediashelf_network
+    restart: unless-stopped
 
   backend:
     build:
@@ -50,3 +56,5 @@ networks:
 
 volumes:
   mongo_data:
+
+

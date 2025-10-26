@@ -1,37 +1,34 @@
-# Stage 1: Build the React application
-# Use Node 20 Alpine as the base image for building
-FROM node:20-alpine AS build
-
-# Set the working directory
+# Stage 1: Base image with Node.js
+FROM node:20-alpine AS base
 WORKDIR /app
 
-# Copy package.json and package-lock.json (or yarn.lock)
+# Stage 2: Install dependencies
+FROM base AS deps
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Stage 3: Build the application
+# Use builder image to create the build
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build the application for production
-# CRA builds output to the 'build' directory by default
 RUN npm run build
 
-# Stage 2: Serve the application with Nginx
-# Use the official Nginx image (Alpine variant for smaller size)
-FROM nginx:stable-alpine
+# Stage 4: Production image
+# Use a minimal production-ready image
+FROM node:20-alpine AS runner
+WORKDIR /app
 
-# Copy the build output from the 'build' stage to Nginx's web root directory
-COPY --from=build /app/build /usr/share/nginx/html
+ENV NODE_ENV=production
 
-# Copy a custom Nginx configuration file for SPA routing (optional but recommended)
-# You can reuse or adapt the nginx.conf from the Angular setup if needed
-# If you don't need custom routing rules yet, you can comment this out
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy the standalone build output from the builder stage
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
-# Expose port 80 (Nginx default)
-EXPOSE 80
+# Next.js runs on port 3000 by default
+EXPOSE 3000
 
-# Start Nginx when the container launches
-CMD ["nginx", "-g", "daemon off;"]
+# The standalone output creates this server.js file for us
+CMD ["node", "server.js"]
