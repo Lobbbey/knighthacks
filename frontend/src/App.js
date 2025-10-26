@@ -1,86 +1,149 @@
-import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import TopNav from './components/TopNav';
-import SideNav from './components/SideNav';
-import {
-  HomePage,
-  MoviesPage,
-  GamesPage,
-  MusicPage,
-  ScanPage,
-  SettingsPage,
-  ProfilePage,
-  AddPage,
-  MyShelfPage
+import { useState, useEffect } from 'react';
+import AuthPage from './components/Authpage';
+import {HomePage} from './components/PageComponents'; 
+import { 
+  MoviesPage, 
+  GamesPage, 
+  MusicPage, 
+  BooksPage, 
+  AddPage, 
+  MyShelfPage, 
+  ProfilePage, 
+  SettingsPage 
 } from './components/PageComponents';
 
-// Layout wrapper that persists nav
-function Layout({ children, isLoggedIn, onLogout }) {
-  if (!isLoggedIn) {
-    return children;
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentPage, setCurrentPage] = useState('home');
+  const [loading, setLoading] = useState(true);
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    
+    if (token && userId) {
+      setIsAuthenticated(true);
+    }
+    setLoading(false);
+  }, []);
+
+  const handleAuthSuccess = (userId) => {
+    setIsAuthenticated(true);
+    setCurrentPage('home');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userEmail');
+    setIsAuthenticated(false);
+    setCurrentPage('home');
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-900">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
   }
 
+  // Show auth page if not authenticated
+  if (!isAuthenticated) {
+    return <AuthPage onAuthSuccess={handleAuthSuccess} />;
+  }
+
+  // Main app layout
   return (
-    <div className="flex flex-col h-screen" style={{ backgroundColor: '#2a2a2a' }}>
-      <TopNav isLoggedIn={isLoggedIn} onLogout={onLogout} />
-      <div className="flex flex-1 overflow-hidden">
-        <SideNav />
-        <main className="flex-1 overflow-y-auto p-8 text-white">
-          {children}
-        </main>
-      </div>
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* Header/Navigation */}
+      <nav className="bg-gray-800 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-8">
+            <h1 className="text-3xl font-bold text-white">MediaShelf</h1>
+            <div className="flex gap-6">
+              <button
+                onClick={() => setCurrentPage('home')}
+                className={`px-4 py-2 rounded ${currentPage === 'home' ? 'bg-green-600' : 'hover:bg-gray-700'}`}
+              >
+                Home
+              </button>
+              <button
+                onClick={() => setCurrentPage('movies')}
+                className={`px-4 py-2 rounded ${currentPage === 'movies' ? 'bg-green-600' : 'hover:bg-gray-700'}`}
+              >
+                Movies
+              </button>
+              <button
+                onClick={() => setCurrentPage('games')}
+                className={`px-4 py-2 rounded ${currentPage === 'games' ? 'bg-green-600' : 'hover:bg-gray-700'}`}
+              >
+                Games
+              </button>
+              <button
+                onClick={() => setCurrentPage('music')}
+                className={`px-4 py-2 rounded ${currentPage === 'music' ? 'bg-green-600' : 'hover:bg-gray-700'}`}
+              >
+                Music
+              </button>
+              <button
+                onClick={() => setCurrentPage('books')}
+                className={`px-4 py-2 rounded ${currentPage === 'books' ? 'bg-green-600' : 'hover:bg-gray-700'}`}
+              >
+                Books
+              </button>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <button
+              onClick={() => setCurrentPage('add')}
+              className="px-4 py-2 bg-green-600 rounded hover:bg-green-700"
+            >
+              Add
+            </button>
+            <button
+              onClick={() => setCurrentPage('shelf')}
+              className={`px-4 py-2 rounded ${currentPage === 'shelf' ? 'bg-green-600' : 'hover:bg-gray-700'}`}
+            >
+              MyShelf
+            </button>
+            <button
+              onClick={() => setCurrentPage('profile')}
+              className={`px-4 py-2 rounded ${currentPage === 'profile' ? 'bg-green-600' : 'hover:bg-gray-700'}`}
+            >
+              Profile
+            </button>
+            <button
+              onClick={() => setCurrentPage('settings')}
+              className={`px-4 py-2 rounded ${currentPage === 'settings' ? 'bg-green-600' : 'hover:bg-gray-700'}`}
+            >
+              Settings
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-600 rounded hover:bg-red-700"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Page Content */}
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {currentPage === 'home' && <HomePage />}
+        {currentPage === 'movies' && <MoviesPage />}
+        {currentPage === 'games' && <GamesPage />}
+        {currentPage === 'music' && <MusicPage />}
+        {currentPage === 'books' && <BooksPage />}
+        {currentPage === 'add' && <AddPage />}
+        {currentPage === 'shelf' && <MyShelfPage />}
+        {currentPage === 'profile' && <ProfilePage />}
+        {currentPage === 'settings' && <SettingsPage />}
+      </main>
     </div>
   );
 }
 
-// Login Page
-function LoginPage({ onLogin }) {
-  return (
-    <div className="flex items-center justify-center h-screen" style={{ backgroundColor: '#2a2a2a' }}>
-      <div className="bg-gray-900 p-8 rounded-lg text-white">
-        <h1 className="text-3xl font-bold mb-6">MediaShelf</h1>
-        <button
-          onClick={onLogin}
-          className="bg-green-600 px-6 py-2 rounded hover:bg-green-700 transition"
-        >
-          Login
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// Main App Component
-export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/*"
-          element={
-            <Layout isLoggedIn={isLoggedIn} onLogout={() => setIsLoggedIn(false)}>
-              {!isLoggedIn ? (
-                <LoginPage onLogin={() => setIsLoggedIn(true)} />
-              ) : (
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/home" element={<HomePage />} />
-                  <Route path="/movies" element={<MoviesPage />} />
-                  <Route path="/games" element={<GamesPage />} />
-                  <Route path="/music" element={<MusicPage />} />
-                  <Route path="/scan" element={<ScanPage />} />
-                  <Route path="/settings" element={<SettingsPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route path="/add" element={<AddPage />} />
-                  <Route path="/myshelf" element={<MyShelfPage />} />
-                </Routes>
-              )}
-            </Layout>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
-  );
-}
+export default App;
