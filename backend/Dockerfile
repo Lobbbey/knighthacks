@@ -4,7 +4,8 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm i
+# Ensure all npm packages are installed
+RUN npm install
 
 COPY . .
 
