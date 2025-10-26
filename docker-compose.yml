@@ -1,18 +1,26 @@
+version: '3.8'
+
 services:
   backend:
-    build: ./Backend
+    build: ./Backend # Path to the backend Dockerfile directory
     container_name: mediashelf_backend
     env_file:
-      - ./Backend/.env
+      - ./Backend/.env # Load environment variables from .env file
     ports:
-      - "5000:5000"
+      - "5000:5000" # Map host port 5000 to container port 5000
     restart: unless-stopped
 
   frontend:
-    build: ./Frontend
+    build:
+      context: ./frontend # Path to the frontend Dockerfile directory
+      dockerfile: Dockerfile # Explicitly name the Dockerfile
     container_name: mediashelf_frontend
     ports:
-      - "3000:80"
+      - "3000:80" # Map host port 3000 to container's Nginx port 80
     depends_on:
-      - backend
+      - backend # Ensure backend starts before frontend (for API calls)
     restart: unless-stopped
+    # Add environment variable for API URL if needed by your React app
+    environment:
+      # React apps typically use REACT_APP_ prefix for env vars
+      - REACT_APP_API_URL=http://backend:5000/api
